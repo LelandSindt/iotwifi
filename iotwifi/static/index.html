@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Config</title>
+
+    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" crossorigin="anonymous"> -->
+</head>
+<body>
+<div class="container" id="main">
+These are not the droids you are looking for.
+</div>
+<div class="container" id="wifi">
+<div class="form-group" >
+    <select class="form-control" id="selectWifi">
+    </select>
+</div>
+<div class="form-group">
+    <input class="form-group" type="text" id="wifiPassword" >
+</div>
+<div class="form-group">
+    <button class="form-group" id="submit" onclick="submit()">submit</button>
+</div>
+</div>
+<div class="container" id="status">
+
+</div>
+<div class="container" id="response">
+
+</div>
+<!--<script src="https://code.jquery.com/jquery-3.3.1.min.js"  crossorigin="anonymous"></script> -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" crossorigin="anonymous"></script> -->
+<script  type = "text/javascript" language = "javascript">
+    $( document ).ready(function() {
+        $('#main').text('hello world');
+        $.getJSON("/scan", function (scan) {
+            $('#response').text(scan['status']);
+            //console.log(scan)
+            if (scan['status'] == "OK") {
+                var selector = $('#selectWifi');
+                $.each(scan['payload'], function (i, item) {
+                    //console.log(i + ' ' + item);
+                    selector.append($('<option></option>').val(i).html(i))
+                });
+            }
+
+        })
+        $.getJSON("/status", function (response) {
+            $('#status').text(JSON.stringify(response))
+        })
+    });
+    function submit() {
+        console.log('submit!');
+        var data = {};
+        data['psk'] = $('#wifiPassword').val();
+        data['ssid'] = $('#selectWifi').val();
+        console.log(JSON.stringify(data));
+        $.ajax({
+            type: 'POST',
+            url: '/connect',
+            data: JSON.stringify(data),
+            complete: function (response) {
+                $('#response').text(JSON.stringify(response))
+
+            }
+        });
+
+    }
+
+</script>
+</body>
+</html>

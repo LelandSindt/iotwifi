@@ -1,3 +1,11 @@
+
+Captive portal POC.
+
+Todo
+ - clean up
+ - handle timeout on /connect (submit)
+ - test, test, test
+
 **Update** 2018-12-01. I am archiving this project. The original use case was to enable the configuration of wifi, over wifi, like many IOT devices on the market. It has worked well for me for this purpose. However, many of the issues people have been reporting as bugs are simply other opinions on how it should work for them, and outside of the original use case. Unfortunately, I don't have the personal resources to help in these requests. If others are willing to be contributors I would be grateful; until then, this project is for reference only.
 
 **Update**: Looking for contributors / maintainers.
