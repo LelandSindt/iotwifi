@@ -1,10 +1,26 @@
 
-Captive portal POC.
+Wifi Config portal POC.
 
-Todo
- - clean up
- - handle timeout on /connect (submit)
- - test, test, test
+isWlan0Connected: uses `iwconfig` to determin if wlan0 is connected to a wifi network.
+
+if wlan0 is connected, turn off uap0
+
+if wlan0 is !connected, turn on uap0
+
+/index.html
+display a list of available wifi networks (returned from /scan)
+accept psk input
+on submit send ssid, psk JSON document to /connect
+
+notify user this AP is about to go away...
+
+may need to introduce some delay in /connect to allow full response to browser before begining config of wlan0
+
+store/presist ssid/psk if wlan0 connection is successfull.
+
+attemp to use stored ssid/psk on startup.
+
+---
 
 **Update** 2018-12-01. I am archiving this project. The original use case was to enable the configuration of wifi, over wifi, like many IOT devices on the market. It has worked well for me for this purpose. However, many of the issues people have been reporting as bugs are simply other opinions on how it should work for them, and outside of the original use case. Unfortunately, I don't have the personal resources to help in these requests. If others are willing to be contributors I would be grateful; until then, this project is for reference only.
 
