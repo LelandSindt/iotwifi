@@ -8,6 +8,7 @@ if wlan0 is connected, turn off uap0
 if wlan0 is !connected, turn on uap0
 
 /index.html
+
 display a list of available wifi networks (returned from /scan)
 accept psk input
 on submit send ssid, psk JSON document to /connect
