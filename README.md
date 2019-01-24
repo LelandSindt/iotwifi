@@ -15,7 +15,7 @@ on submit send ssid, psk JSON document to /connect
 
 notify user this AP is about to go away...
 
-may need to introduce some delay in /connect to allow full response to browser before begining config of wlan0
+may need to introduce some delay in /connect to allow full response to browser before beginning config of wlan0
 
 store/presist ssid/psk if wlan0 connection is successfull.
 
