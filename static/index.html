@@ -36,8 +36,9 @@ These are not the droids you are looking for.
             if (scan['status'] == "OK") {
                 var selector = $('#selectWifi');
                 $.each(scan['payload'], function (i, item) {
-                    //console.log(i + ' ' + item);
-                    selector.append($('<option></option>').val(i).html(i))
+                    if (!i.includes('\\x00')) {
+                        selector.append($('<option></option>').val(i).html(i))
+                    }
                 });
             }
 
