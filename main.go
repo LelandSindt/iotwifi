@@ -42,6 +42,7 @@ func main() {
 	cfgUrl := setEnvIfEmpty("IOTWIFI_CFG", "cfg/wificfg.json")
 	port := setEnvIfEmpty("IOTWIFI_PORT", "8080")
 	static := setEnvIfEmpty("IOTWIFI_STATIC", "/static/")
+	allowKill := setEnvIfEmpty("WIFI_ALLOW_KILL","false")
 
 	go iotwifi.RunWifi(blog, messages, cfgUrl)
 	wpacfg := iotwifi.NewWpaCfg(blog, cfgUrl)
@@ -196,7 +197,9 @@ func main() {
 	r.HandleFunc("/status", statusHandler)
 	r.HandleFunc("/connect", connectHandler).Methods("POST")
 	r.HandleFunc("/scan", scanHandler)
-	r.HandleFunc("/kill", killHandler)
+	if allowKill == "true" {
+		r.HandleFunc("/kill", killHandler)
+	}
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(static)))
 	http.Handle("/", r)
 
