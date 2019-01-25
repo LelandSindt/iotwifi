@@ -32,7 +32,6 @@ These are not the droids you are looking for.
         $('#main').text('hello world');
         $.getJSON("/scan", function (scan) {
             $('#response').text(scan['status']);
-            //console.log(scan)
             if (scan['status'] == "OK") {
                 var selector = $('#selectWifi');
                 $.each(scan['payload'], function (i, item) {
@@ -52,7 +51,6 @@ These are not the droids you are looking for.
         var data = {};
         data['psk'] = $('#wifiPassword').val();
         data['ssid'] = $('#selectWifi').val();
-        console.log(JSON.stringify(data));
         $.ajax({
             type: 'POST',
             url: '/connect',
