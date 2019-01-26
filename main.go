@@ -113,6 +113,11 @@ func main() {
 
 		blog.Info("Connect Handler Got: ssid:|%s| psk:|redacted|", creds.Ssid)
 
+		//todo: check to see that psk and ssid are valid -> reject | continue.
+		//todo: only allow 1 network config
+		// if none -> create
+		// if one -> delete -> create
+
 		connection, err := wpacfg.ConnectNetwork(creds)
 		if err != nil {
 			blog.Error(err.Error())
