@@ -20,16 +20,16 @@ These are not the droids you are looking for.
     <button class="form-group" id="submit" onclick="submit()">submit</button>
 </div>
 </div>
-<div class="container" id="status">
+<div class="container" id="status" style="border:.5px solid black;">
 
 </div>
-<div class="container" id="response">
+<div class="container" id="response" style="border:.5px solid black;">
 
 </div>
 <script src="/jquery-3.3.1.min.js"></script>
 <script  type = "text/javascript" language = "javascript">
     $( document ).ready(function() {
-        $('#main').text('hello world');
+        $('#main').text('these are not the droids we are looking for.');
         $.getJSON("/scan", function (scan) {
             $('#response').text(scan['status']);
             if (scan['status'] == "OK") {
