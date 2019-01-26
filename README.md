@@ -3,6 +3,8 @@ Wifi Config portal POC.
 
 isWlan0Connected: uses `iwconfig` to determin if wlan0 is connected to a wifi network.
 
+wpacfg.StartAP  // starts hostapd --> called by iotwifi.RunWifi
+
 if wlan0 is connected, turn off uap0
 
 if wlan0 is !connected, turn on uap0
