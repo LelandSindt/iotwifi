@@ -48,6 +48,10 @@ docker container run --name iotwifi --detach --rm --privileged --net host \
       iotwifi
 ```
 
+use ` wpa_cli list_networks` to build a list of configured networks to return via ?/configued?
+
+create ?/delete? -d {'net_id':#} to allow a configured network to be deleted...
+
 ---
 
 **Update** 2018-12-01. I am archiving this project. The original use case was to enable the configuration of wifi, over wifi, like many IOT devices on the market. It has worked well for me for this purpose. However, many of the issues people have been reporting as bugs are simply other opinions on how it should work for them, and outside of the original use case. Unfortunately, I don't have the personal resources to help in these requests. If others are willing to be contributors I would be grateful; until then, this project is for reference only.

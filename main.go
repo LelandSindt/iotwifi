@@ -1,5 +1,7 @@
 // IoT Wifi Management
 
+// Todo: make wpa_supplicant and hostapd debug off by default enable by env variable
+
 package main
 
 import (
