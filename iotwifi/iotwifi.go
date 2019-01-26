@@ -79,6 +79,11 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	// todo: start wpa_supplicant...
 	// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
+	// the more I think about this, I think that there should be two go functions/threads
+	// one to run wpa_supplicant (wlan0)
+	// a second to monitor wlan0's connection state and bring up uap0, hostapd, dnsmasq
+	//    take down uap0, hostapd, dnsmasq...
+
 
 	log.Info("Loading IoT Wifi...")
 
@@ -108,7 +113,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	})
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
-	wpacfg.StartAP() //hosapd
+	//wpacfg.StartAP() //hostapd
 
 	time.Sleep(10 * time.Second)
 
@@ -118,7 +123,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	time.Sleep(5 * time.Second)
 	wpacfg.ScanNetworks()
 
-	command.StartDnsmasq() //dnsmasq
+	//command.StartDnsmasq() //dnsmasq
 
 	// staticFields for logger
 	staticFields := make(map[string]interface{})
