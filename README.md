@@ -18,8 +18,35 @@ notify user this AP is about to go away...
 may need to introduce some delay in /connect to allow full response to browser before beginning config of wlan0
 
 store/presist ssid/psk if wlan0 connection is successfull.
+-- already there -- https://github.com/LelandSindt/iotwifi/blob/master/iotwifi/wpacfg.go#L198
+
+However, it is failing.
+
+{"time":"2019-01-26T03:49:32.461Z","cmd_id":null,"msg":"WPA Enable state: COMPLETED"}
+{"time":"2019-01-26T03:49:32.465Z","cmd_id":"wpa_supplicant","msg":"wlan0: Control interface command 'SAVE_CONFIG'"}
+{"time":"2019-01-26T03:49:32.466Z","cmd_id":"wpa_supplicant","msg":"Writing configuration file '/etc/wpa_supplicant/wpa_supplicant.conf.tmp'"}
+{"time":"2019-01-26T03:49:32.476Z","cmd_id":null,"msg":"WPA save got: FAIL"}
+{"time":"2019-01-26T03:49:32.475Z","cmd_id":"wpa_supplicant","msg":"Configuration file '/etc/wpa_supplicant/wpa_supplicant.conf' written unsuccessfully"}
+{"time":"2019-01-26T03:49:32.481Z","cmd_id":"wpa_supplicant","msg":"CTRL_IFACE: SAVE_CONFIG - Failed to update configuration"}
+
+was failing because I was mapping to the wpa_supplicant.conf file instead of the directory.
+
+fails
+-v $(pwd)/wpa_supplicant/wpa_supplicant.conf:/etc/wpa_supplicant/wpa_supplicant.conf
+works
+-v $(pwd)/wpa_supplicant:/etc/wpa_supplicant
+
 
 attemp to use stored ssid/psk on startup.
+--- working...
+
+```bash
+docker container run --name iotwifi --detach --rm --privileged --net host \
+      -v $(pwd)/wificfg.json:/cfg/wificfg.json \
+      -v $(pwd)/wpa_supplicant:/etc/wpa_supplicant \
+      -v $(pwd)/iotwifi/static:/static \
+      iotwifi
+```
 
 ---
 
