@@ -77,6 +77,8 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 
 // RunWifi starts AP and Station modes.
 func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
+	// todo: start wpa_supplicant...
+	// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
 
 	log.Info("Loading IoT Wifi...")
 
@@ -106,17 +108,17 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	})
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
-	wpacfg.StartAP()
+	wpacfg.StartAP() //hosapd
 
 	time.Sleep(10 * time.Second)
 
-	command.StartWpaSupplicant()
+	command.StartWpaSupplicant() //wpa_supplicant
 
 	// Scan
 	time.Sleep(5 * time.Second)
 	wpacfg.ScanNetworks()
 
-	command.StartDnsmasq()
+	command.StartDnsmasq() //dnsmasq
 
 	// staticFields for logger
 	staticFields := make(map[string]interface{})
