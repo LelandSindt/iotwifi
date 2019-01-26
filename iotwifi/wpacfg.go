@@ -135,6 +135,22 @@ func (wpa *WpaCfg) ConfiguredNetworks() string {
 	return string(netOut)
 }
 
+func interfaceState(iface string) string {
+	// regex for state
+	rState := regexp.MustCompile("(?m)wpa_state=(.*)\n")
+	stateOut, err := exec.Command("wpa_cli", "-i", iface, "status").Output()
+	if err != nil {
+		return "none"
+	}
+	ms := rState.FindSubmatch(stateOut)
+	if len(ms) > 0 {
+		state := string(ms[1])
+		// see https://developer.android.com/reference/android/net/wifi/SupplicantState.html
+		return state
+	}
+	return "none"
+}
+
 // ConnectNetwork connects to a wifi network
 func (wpa *WpaCfg) ConnectNetwork(creds WpaCredentials) (WpaConnection, error) {
 	connection := WpaConnection{}
@@ -175,43 +191,41 @@ func (wpa *WpaCfg) ConnectNetwork(creds WpaCredentials) (WpaConnection, error) {
 	enableStatus := strings.TrimSpace(string(enableOut))
 	wpa.Log.Info("WPA enable got: %s", enableStatus)
 
-	// regex for state
-	rState := regexp.MustCompile("(?m)wpa_state=(.*)\n")
 
-	// loop for status every second
+	// loop for status every 3 seconds
 	for i := 0; i < 5; i++ {
 		wpa.Log.Info("WPA Checking wifi state")
 
-		stateOut, err := exec.Command("wpa_cli", "-i", "wlan0", "status").Output()
-		if err != nil {
-			wpa.Log.Fatal("Got error checking state: %s", err.Error())
-			return connection, err
-		}
-		ms := rState.FindSubmatch(stateOut)
+    state := interfaceState("wlan0")
+    wpa.Log.Info("WPA Enable state: %s Attempt: %s", state, string(i))
+    // see https://developer.android.com/reference/android/net/wifi/SupplicantState.html
+    if state == "COMPLETED" {
+      // save the config
+      saveOut, err := exec.Command("wpa_cli", "-i", "wlan0", "save_config").Output()
+      if err != nil {
+        wpa.Log.Fatal(err.Error())
+        return connection, err
+      }
+      saveStatus := strings.TrimSpace(string(saveOut))
+      wpa.Log.Info("WPA save got: %s", saveStatus)
 
-		if len(ms) > 0 {
-			state := string(ms[1])
-			wpa.Log.Info("WPA Enable state: %s", state)
-			// see https://developer.android.com/reference/android/net/wifi/SupplicantState.html
-			if state == "COMPLETED" {
-				// save the config
-				saveOut, err := exec.Command("wpa_cli", "-i", "wlan0", "save_config").Output()
-				if err != nil {
-					wpa.Log.Fatal(err.Error())
-					return connection, err
-				}
-				saveStatus := strings.TrimSpace(string(saveOut))
-				wpa.Log.Info("WPA save got: %s", saveStatus)
+      connection.Ssid = creds.Ssid
+      connection.State = state
 
-				connection.Ssid = creds.Ssid
-				connection.State = state
-
-				return connection, nil
-			}
-		}
-
+      return connection, nil
+    }
 		time.Sleep(3 * time.Second)
 	}
+
+	// remove network
+	wpa.Log.Info("WPA remove net: %s", net)
+	removeNetOut, err := exec.Command("wpa_cli", "-i", "wlan0", "remove_network", net).Output()
+	if err != nil {
+		wpa.Log.Fatal(err)
+		return connection, err
+	}
+	removeNetStatus := strings.TrimSpace(string(removeNetOut))
+	wpa.Log.Info("WPA remove network got: %s", removeNetStatus)
 
 	connection.State = "FAIL"
 	connection.Message = "Unable to connection to " + creds.Ssid
