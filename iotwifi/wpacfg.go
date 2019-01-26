@@ -126,16 +126,6 @@ rsn_pairwise=CCMP`
 	}
 }
 
-// ConfiguredNetworks returns a list of configured wifi networks.
-func (wpa *WpaCfg) ConfiguredNetworks() string {
-	netOut, err := exec.Command("wpa_cli", "-i", "wlan0", "scan").Output()
-	if err != nil {
-		wpa.Log.Fatal(err)
-	}
-
-	return string(netOut)
-}
-
 func interfaceState(iface string) string {
 	// regex for state
 	rState := regexp.MustCompile("(?m)wpa_state=(.*)\n")
