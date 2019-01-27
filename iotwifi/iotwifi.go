@@ -7,6 +7,7 @@ package iotwifi
 import (
 	"bufio"
 	"encoding/json"
+	"github.com/bhoriuchi/go-bunyan/bunyan"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -14,8 +15,6 @@ import (
 	"os/exec"
 	"regexp"
 	"time"
-
-	"github.com/bhoriuchi/go-bunyan/bunyan"
 )
 
 // CmdRunner runs internal commands allows output handlers to be attached.
@@ -75,14 +74,30 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 	return v, err
 }
 
+func RunAP(log bunyan.Logger) {
+	staticFields := make(map[string]interface{})
+	for {
+		// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
+		// the more I think about this, I think that there should be two go functions/threads
+		// one to run wpa_supplicant (wlan0)
+		// a second to monitor wlan0's connection state and bring up uap0, hostapd, dnsmasq
+		//    take down uap0, hostapd, dnsmasq...
+		staticFields["cmd_id"] = "none"
+		staticFields["cmd"] = "none"
+		staticFields["is_error"] = "none"
+
+		log.Info(staticFields, "tic")
+		time.Sleep(5 * time.Second)
+
+
+	}
+
+}
+
 // RunWifi starts AP and Station modes.
 func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	// todo: start wpa_supplicant...
-	// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
-	// the more I think about this, I think that there should be two go functions/threads
-	// one to run wpa_supplicant (wlan0)
-	// a second to monitor wlan0's connection state and bring up uap0, hostapd, dnsmasq
-	//    take down uap0, hostapd, dnsmasq...
+
 
 
 	log.Info("Loading IoT Wifi...")
@@ -112,16 +127,16 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 		os.Exit(1)
 	})
 
-	wpacfg := NewWpaCfg(log, cfgLocation)
+	//wpacfg := NewWpaCfg(log, cfgLocation)
 	//wpacfg.StartAP() //hostapd
 
-	time.Sleep(10 * time.Second)
+	//time.Sleep(10 * time.Second)
 
 	command.StartWpaSupplicant() //wpa_supplicant
 
 	// Scan
-	time.Sleep(5 * time.Second)
-	wpacfg.ScanNetworks()
+	//time.Sleep(5 * time.Second)
+	//wpacfg.ScanNetworks()
 
 	//command.StartDnsmasq() //dnsmasq
 

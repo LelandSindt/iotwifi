@@ -33,6 +33,9 @@ These are not the droids you are looking for.
         $.getJSON("/scan", function (scan) {
             $('#response').text(scan['status']);
             if (scan['status'] == "OK") {
+                // todo: if status !OK or empty payload, retry /scan
+                // ?use label to just back just before getJSON?
+                // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/label
                 var selector = $('#selectWifi');
                 $.each(scan['payload'], function (i, item) {
                     if (!i.includes('\\x00')) {

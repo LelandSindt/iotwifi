@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/bhoriuchi/go-bunyan/bunyan"
-	"github.com/cjimti/iotwifi/iotwifi"
+	"github.com/lelandsindt/iotwifi/iotwifi"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -47,6 +47,7 @@ func main() {
 	allowKill := setEnvIfEmpty("WIFI_ALLOW_KILL","false")
 
 	go iotwifi.RunWifi(blog, messages, cfgUrl)
+	go iotwifi.RunAP(blog)
 	wpacfg := iotwifi.NewWpaCfg(blog, cfgUrl)
 
 	apiPayloadReturn := func(w http.ResponseWriter, message string, payload interface{}) {
