@@ -74,12 +74,33 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 	return v, err
 }
 
-func RunAP(log bunyan.Logger) {
+func RunAP(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	staticFields := make(map[string]interface{})
 	lastInterfaceState := "none"
 	curInterfaceState := "none"
 	loopcount := 0
 	isApOn := false
+
+	cmdRunner := CmdRunner{
+		Log:      log,
+		Messages: messages,
+		Handlers: make(map[string]func(cmsg CmdMessage), 0),
+		Commands: make(map[string]*exec.Cmd, 0),
+	}
+
+	setupCfg, err := loadCfg(cfgLocation)
+	if err != nil {
+		log.Error("Could not load config: %s", err.Error())
+		return
+	}
+
+	command := &Command{
+		Log:      log,
+		Runner:   cmdRunner,
+		SetupCfg: setupCfg,
+	}
+
+	wpacfg := NewWpaCfg(log, cfgLocation)
 
 	for {
 		// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
@@ -105,11 +126,21 @@ func RunAP(log bunyan.Logger) {
 						if lastInterfaceState == "COMPLETED" {
 							if isApOn == true{
 								log.Info(staticFields, "Turn off AP")
+								command.stopHostapd()
+								command.stopDnsmasq()
+								command.RemoveApInterface()
 								isApOn = false
 							}
 						} else {
 							if isApOn == false {
 								log.Info(staticFields, "Turn on AP")
+								command.stopWpaSupplicant()
+								time.Sleep(1 * time.Second)
+								wpacfg.StartAP() //hostapd
+								time.Sleep(1 * time.Second)
+								command.StartWpaSupplicant()
+								time.Sleep(1 * time.Second)
+								command.StartDnsmasq() //dnsmasq
 								isApOn = true
 							}
 						}

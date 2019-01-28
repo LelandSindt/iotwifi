@@ -61,6 +61,16 @@ func (c *Command) StartWpaSupplicant() {
 	go c.Runner.ProcessCmd("wpa_supplicant", cmd)
 }
 
+func (c *Command) stopWpaSupplicant() {
+	args := []string{
+		"wpa_supplicant",
+	}
+
+	cmd := exec.Command("killall", args...)
+	cmd.Start()
+	cmd.Wait()
+}
+
 // StartDnsmasq starts dnsmasq.
 func (c *Command) StartDnsmasq() {
 	// hostapd is enabled, fire up dnsmasq
@@ -80,4 +90,24 @@ func (c *Command) StartDnsmasq() {
 
 	cmd := exec.Command("dnsmasq", args...)
 	go c.Runner.ProcessCmd("dnsmasq", cmd)
+}
+
+func (c *Command) stopDnsmasq() {
+	args := []string{
+		"dnsmasq",
+	}
+
+	cmd := exec.Command("killall", args...)
+	cmd.Start()
+	cmd.Wait()
+}
+
+func (c *Command) stopHostapd() {
+	args := []string{
+		"hostapd",
+	}
+
+	cmd := exec.Command("killall", args...)
+	cmd.Start()
+	cmd.Wait()
 }

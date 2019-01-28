@@ -47,7 +47,7 @@ func main() {
 	allowKill := setEnvIfEmpty("WIFI_ALLOW_KILL","false")
 
 	go iotwifi.RunWifi(blog, messages, cfgUrl)
-	go iotwifi.RunAP(blog)
+	go iotwifi.RunAP(blog, messages, cfgUrl)
 	wpacfg := iotwifi.NewWpaCfg(blog, cfgUrl)
 
 	apiPayloadReturn := func(w http.ResponseWriter, message string, payload interface{}) {

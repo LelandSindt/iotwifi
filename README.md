@@ -1,9 +1,7 @@
 
 Wifi Config portal POC.
 
-isWlan0Connected: uses `iwconfig` to determin if wlan0 is connected to a wifi network.
-
-wpacfg.StartAP  // starts hostapd --> called by iotwifi.RunWifi
+Todo: consider merging RunAp and RunWifi
 
 if wlan0 is connected, turn off uap0
 
@@ -61,6 +59,15 @@ docker container run --name iotwifi --detach --rm --privileged --net host \
 use ` wpa_cli list_networks` to build a list of configured networks to return via ?/configued?
 
 create ?/delete? -d {'net_id':#} to allow a configured network to be deleted...
+
+killall is working but leaving zombie processes.. this is not ideal.
+```
+  12 root      0:00 [wpa_supplicant]       
+  49 root      0:00 [hostapd]              
+  50 root      0:00 [wpa_supplicant]       
+  51 nobody    0:00 [dnsmasq]              
+  84 root      0:00 /bin/sh                
+```
 
 ```
 docker container logs iotwifi --follow |jq -c '. | {time,cmd_id,msg}'
