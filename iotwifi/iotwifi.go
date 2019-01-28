@@ -78,6 +78,8 @@ func RunAP(log bunyan.Logger) {
 	staticFields := make(map[string]interface{})
 	lastInterfaceState := "none"
 	curInterfaceState := "none"
+	loopcount := 0
+	isApOn := false
 
 	for {
 		// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
@@ -89,12 +91,40 @@ func RunAP(log bunyan.Logger) {
 
 		curInterfaceState = interfaceState("wlan0")
 		if lastInterfaceState != curInterfaceState {
-			lastInterfaceState = curInterfaceState
-			log.Info(staticFields, "New State: " + curInterfaceState)
+			log.Info(staticFields, "Begin: " + curInterfaceState)
+			loopcount = 0
+			for {
+				curInterfaceState = interfaceState("wlan0")
+				if lastInterfaceState == curInterfaceState {
+					break
+				} else {
+					//todo: change this to a sane number ?6? -- 30 seconds totoal
+					if loopcount > 5 {
+						lastInterfaceState = interfaceState("wlan0")
+						log.Info(staticFields, "New: " + lastInterfaceState)
+						if lastInterfaceState == "COMPLETED" {
+							if isApOn == true{
+								log.Info(staticFields, "Turn off AP")
+								isApOn = false
+							}
+						} else {
+							if isApOn == false {
+								log.Info(staticFields, "Turn on AP")
+								isApOn = true
+							}
+						}
+						break
+					}
+				log.Info(staticFields, "Transition: " + lastInterfaceState + " -> " + curInterfaceState)
+				loopcount ++
+				//todo: change this to a sane number ?5 seconds? -- 30 seconds total
+				time.Sleep(1 * time.Second)
+				}
+			}
 		}
-		time.Sleep(1 * time.Second)
+		//Todo: change this to a sane number -- ?30? seconds?
+		time.Sleep(5 * time.Second)
 	}
-
 }
 
 
