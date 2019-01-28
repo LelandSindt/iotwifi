@@ -134,7 +134,7 @@ func RunAP(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 						} else {
 							if isApOn == false {
 								log.Info(staticFields, "Turn on AP")
-								command.stopWpaSupplicant()
+								command.stopWpaSupplicant() //Todo: not entirely sure this is required, test further.
 								time.Sleep(1 * time.Second)
 								wpacfg.StartAP() //hostapd
 								time.Sleep(1 * time.Second)
