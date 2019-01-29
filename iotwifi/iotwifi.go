@@ -210,6 +210,7 @@ func (c *CmdRunner) HandleFunc(cmdId string, handler func(cmdMessage CmdMessage)
 }
 
 // ProcessCmd processes an internal command.
+//todo: add a method for signaling/killing cmd...
 func (c *CmdRunner) ProcessCmd(id string, cmd *exec.Cmd) {
 	c.Log.Debug("ProcessCmd got %s", id)
 
