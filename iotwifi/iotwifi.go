@@ -74,12 +74,20 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 	return v, err
 }
 
-func RunAP(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
+// the more I think about this, I think that there should be two go functions/threads
+// one to run wpa_supplicant (wlan0) and watch wlan0's connection state and
+// bring up uap0, hostapd, dnsmasq
+// take down uap0, hostapd, dnsmasq...
+// and a second go function/thread to handle message logging.
+
+func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	staticFields := make(map[string]interface{})
 	lastInterfaceState := "none"
 	curInterfaceState := "none"
 	loopcount := 0
 	isApOn := false
+
+	log.Info("Loading IoT Wifi...")
 
 	cmdRunner := CmdRunner{
 		Log:      log,
@@ -102,12 +110,11 @@ func RunAP(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
 
+	command.StartWpaSupplicant() //wpa_supplicant
+
 	for {
 		// if interfaceState(wlan0) == "CONNECTED" then { stop uap0 } else { start uap0 }
-		// the more I think about this, I think that there should be two go functions/threads
-		// one to run wpa_supplicant (wlan0)
-		// a second to monitor wlan0's connection state and bring up uap0, hostapd, dnsmasq
-		//    take down uap0, hostapd, dnsmasq...
+
 		staticFields["cmd_id"] = "State change"
 
 		curInterfaceState = interfaceState("wlan0")
@@ -160,12 +167,7 @@ func RunAP(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 
 
 // RunWifi starts AP and Station modes.
-func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
-	// todo: start wpa_supplicant...
-
-
-
-	log.Info("Loading IoT Wifi...")
+func HandleLog(log bunyan.Logger, messages chan CmdMessage) {
 
 	cmdRunner := CmdRunner{
 		Log:      log,
@@ -174,36 +176,11 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 		Commands: make(map[string]*exec.Cmd, 0),
 	}
 
-	setupCfg, err := loadCfg(cfgLocation)
-	if err != nil {
-		log.Error("Could not load config: %s", err.Error())
-		return
-	}
-
-	command := &Command{
-		Log:      log,
-		Runner:   cmdRunner,
-		SetupCfg: setupCfg,
-	}
-
 	// listen to kill messages
 	cmdRunner.HandleFunc("kill", func(cmsg CmdMessage) {
 		log.Error("GOT KILL")
 		os.Exit(1)
 	})
-
-	//wpacfg := NewWpaCfg(log, cfgLocation)
-	//wpacfg.StartAP() //hostapd
-
-	//time.Sleep(10 * time.Second)
-
-	command.StartWpaSupplicant() //wpa_supplicant
-
-	// Scan
-	//time.Sleep(5 * time.Second)
-	//wpacfg.ScanNetworks()
-
-	//command.StartDnsmasq() //dnsmasq
 
 	// staticFields for logger
 	staticFields := make(map[string]interface{})
