@@ -110,6 +110,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
 
+	command.RemoveApInterface()
 	command.StartWpaSupplicant() //wpa_supplicant
 
 	for {
