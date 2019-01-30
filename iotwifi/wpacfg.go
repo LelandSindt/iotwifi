@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+
 	"github.com/bhoriuchi/go-bunyan/bunyan"
 )
 
@@ -56,6 +57,8 @@ func NewWpaCfg(log bunyan.Logger, cfgLocation string) *WpaCfg {
 	}
 }
 
+//type Cmd Command
+
 // StartAP starts AP mode.
 func (wpa *WpaCfg) StartAP() {
 	wpa.Log.Info("Starting Hostapd.")
@@ -69,7 +72,7 @@ func (wpa *WpaCfg) StartAP() {
 	command.AddApInterface()
 	command.UpApInterface()
 	command.ConfigureApInterface()
-
+  //Todo: extend (or create similar process) iotwifi.ProcessCmd to run hostapd...
 	//cmd := exec.Command("hostapd", "-d", "/dev/stdin")
 	cmd := exec.Command("hostapd", "/dev/stdin")
 
@@ -108,6 +111,12 @@ rsn_pairwise=CCMP`
 
 	cmd.Start()
 	hostapdPipe.Close()
+
+	go func() {
+		wpa.Log.Info("HOSTAPD WAIT")
+		err := cmd.Wait()
+		wpa.Log.Info("HOSTAPD DONE, GOT %s", err)
+	}()
 
 	for {
 		out := <-messages // Block until we receive a message on the channel
