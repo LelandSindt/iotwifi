@@ -1,6 +1,9 @@
 // IoT Wifi Management
 
 // Todo: make wpa_supplicant and hostapd debug off by default enable by env variable
+// Todo: determine why...
+//   when wpa_supplicant is populated, connects, looses connection -> uap0/AP network comes up.
+//   when wpa_supplicant is blank, does not connect -> uap0 comes up AP does not.
 
 package main
 
