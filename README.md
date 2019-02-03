@@ -1,6 +1,10 @@
 
 Wifi Config portal POC.
 
+note:
+
+when uap0 is running on channel X, when wlan0 connects to a network on channel Y it forces uap0 to channel Y.
+
 Todo: consider merging RunAp and RunWifi
 
 if wlan0 is connected, turn off uap0
