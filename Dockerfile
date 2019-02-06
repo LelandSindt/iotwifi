@@ -6,7 +6,7 @@ WORKDIR /go/src
 RUN mkdir -p /go/src/github.com/lelandsindt/iotwifi
 COPY . /go/src/github.com/lelandsindt/iotwifi
 
-RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o /go/bin/wifi /go/src/github.com/lelandsindt/iotwifi/main.go
+RUN GOOS=linux GOARCH=arm GOARM=5 CGO_ENABLED=0 go build -a -installsuffix cgo -o /go/bin/wifi /go/src/github.com/lelandsindt/iotwifi/main.go
 
 FROM balenalib/rpi-alpine
 RUN [ "cross-build-start" ]
