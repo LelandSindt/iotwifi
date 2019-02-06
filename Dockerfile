@@ -1,4 +1,3 @@
-#FROM arm32v6/golang:1.10.1-alpine3.7 AS builder
 FROM golang:1.10.1-alpine3.7 AS builder
 
 ENV GOPATH /go
@@ -9,12 +8,13 @@ COPY . /go/src/github.com/lelandsindt/iotwifi
 
 RUN CGO_ENABLED=0 go build -a -installsuffix cgo -o /go/bin/wifi /go/src/github.com/lelandsindt/iotwifi/main.go
 
-FROM arm32v6/alpine
+FROM balenalib/rpi-alpine
+RUN [ "cross-build-start" ]
 
-RUN apk update
-RUN apk add bridge hostapd wireless-tools wpa_supplicant dnsmasq iw
+RUN apk add --no-cache bridge hostapd wireless-tools wpa_supplicant dnsmasq iw
 
 RUN mkdir -p /etc/wpa_supplicant/
+RUN [ "cross-build-end" ]
 COPY ./dev/configs/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
 
 WORKDIR /
